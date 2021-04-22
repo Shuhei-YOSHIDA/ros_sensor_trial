@@ -1,0 +1,11 @@
+# setting for tag25h9, with publishing tf
+tag_family:        'tag25h9'
+tag_border:        1
+tag_threads:       2
+tag_decimate:      1.0
+tag_blur:          0.0
+tag_refine_edges:  1
+tag_refine_decode: 0
+tag_refine_pose:   1 #Computationaly expensive
+tag_debug:         0
+publish_tf:        true

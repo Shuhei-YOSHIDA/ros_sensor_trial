@@ -1,0 +1,12 @@
+# 8 standalone tags of tag25h9, id is from 0 to 7
+standalone_tags:
+  [
+    {id: 0, size: 0.076}
+    {id: 1, size: 0.076}
+    {id: 2, size: 0.076}
+    {id: 3, size: 0.076}
+    {id: 4, size: 0.076}
+    {id: 5, size: 0.076}
+    {id: 6, size: 0.076}
+    {id: 7, size: 0.076}
+  ]
