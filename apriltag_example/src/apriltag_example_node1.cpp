@@ -1,5 +1,6 @@
 /**
- * @file apriltag_example_node.cpp
+ * @file apriltag_example_node1.cpp
+ * @brief Detect tag(id=0) and set marker on it
  */
 
 #include <ros/ros.h>
@@ -69,7 +70,7 @@ void tagCB(const apriltag_ros::AprilTagDetectionArray::ConstPtr& msg)
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "apriltag_example_node");
+  ros::init(argc, argv, "apriltag_example_node1");
   ros::NodeHandle nh;
 
   marker_pub = nh.advertise<visualization_msgs::MarkerArray>("tag_mrk", 1);
