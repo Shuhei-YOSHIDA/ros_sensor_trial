@@ -3,7 +3,6 @@
  * @brief Detect the tag(id=0),  set a path on it, and navigate the camera to follow the path
  */
 
-#include "tf2/convert.h"
 #include <ros/ros.h>
 #include <apriltag_ros/AprilTagDetectionArray.h>
 #include <nav_msgs/Path.h>
@@ -108,7 +107,7 @@ visualization_msgs::MarkerArray makeNaviMarkers(string comment,
     error_mrk.color.a = 0.6;
     error_mrk.color.r = 1.0;
     error_mrk.color.g = 1.0; // Yellow
-    error_mrk.scale.x = error_mrk.scale.y = error_mrk.scale.z = 0.025;
+    error_mrk.scale.x = error_mrk.scale.y = error_mrk.scale.z = 0.05;
     error_mrk.pose.position.z = text_mrk.pose.position.z + 0.1;
     error_mrk.id = 1;
 
@@ -240,6 +239,15 @@ int main(int argc, char** argv)
         loop.sleep();
         continue;
       }
+
+      tf2::Vector3 v;
+      tf2::Quaternion q;
+      tf2::convert(target.pose.position, v);
+      tf2::convert(target.pose.orientation, q);
+      tf2::Transform tf_trg(q, v);
+      tf2::Transform tf_tag_frame;
+      tf2::convert(tf_msg.transform, tf_tag_frame);
+      tf2::convert(tf_tag_frame*tf_trg, tf_msg.transform);
 
       // Check whether camera reaches or not
       if (isCameraReached(target, tf_msg))
