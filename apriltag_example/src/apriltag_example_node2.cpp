@@ -145,7 +145,8 @@ visualization_msgs::MarkerArray makeNaviMarkers(string comment,
     arrow_mrk.color.g = 1.0; // Yellow
     arrow_mrk.pose.orientation.w = 1.0;
     arrow_mrk.points.resize(2);
-    arrow_mrk.points[0].x = arrow_mrk.points[0].y = arrow_mrk.points[0].z = 0.0;
+    arrow_mrk.points[0].x = arrow_mrk.points[0].y = 0.0;
+    arrow_mrk.points[0].z = 0.3;
     arrow_mrk.points[1].x = trg.transform.translation.x;
     arrow_mrk.points[1].y = trg.transform.translation.y;
     arrow_mrk.points[1].z = trg.transform.translation.z;
@@ -176,7 +177,8 @@ bool isCameraReached(const geometry_msgs::PoseStamped& target_pose_on_tag_id,
   Eigen::Quaterniond q;
   tf::quaternionMsgToEigen(target_pose_on_camera.pose.orientation, q);
 
-  if (p.norm() < 0.1 && Eigen::AngleAxisd(q).angle() < 3.0 * M_PI/180.)
+  //if (p.norm() < 0.1 && Eigen::AngleAxisd(q).angle() < 3.0 * M_PI/180.)
+  if (p.norm() < 0.1)
   {
     return true;
   }
@@ -220,40 +222,40 @@ int main(int argc, char** argv)
     {
       ros::spinOnce();
       // Navigate by TF
-      geometry_msgs::TransformStamped tf_msg;
+      geometry_msgs::TransformStamped tf_tag_origin_on_cam;
       try
       {
         auto stamp = ros::Time::now();
         tf_buffer.canTransform(camera_frame_id, target_tag_frame_id, stamp, ros::Duration(0.1));
-        tf_msg = tf_buffer.lookupTransform(camera_frame_id, target_tag_frame_id, stamp);
+        tf_tag_origin_on_cam = tf_buffer.lookupTransform(camera_frame_id, target_tag_frame_id, stamp);
       }
       catch (tf2::TransformException& ex)
       {
         ROS_DEBUG("%s", ex.what());
         // Show error message(Marker)
         string comment = "could not find any tag";
-        tf_msg.header.frame_id = camera_frame_id;
-        tf_msg.child_frame_id = "";
-        visualization_msgs::MarkerArray navi_mrk = makeNaviMarkers(comment, tf_msg);
+        tf_tag_origin_on_cam.header.frame_id = camera_frame_id;
+        tf_tag_origin_on_cam.child_frame_id = "";
+        visualization_msgs::MarkerArray navi_mrk = makeNaviMarkers(comment, tf_tag_origin_on_cam);
         navi_mrks_pub.publish(navi_mrk);
         loop.sleep();
         continue;
       }
 
-      tf2::Vector3 v;
-      tf2::Quaternion q;
-      tf2::convert(target.pose.position, v);
-      tf2::convert(target.pose.orientation, q);
-      tf2::Transform tf_trg(q, v);
+      geometry_msgs::TransformStamped tf_tag_trg_on_cam;
+      tf_tag_trg_on_cam.header = tf_tag_origin_on_cam.header;
+      tf_tag_trg_on_cam.child_frame_id = tf_tag_origin_on_cam.child_frame_id;
+      tf2::Transform tf_trg;
+      tf2::convert(target.pose, tf_trg);
       tf2::Transform tf_tag_frame;
-      tf2::convert(tf_msg.transform, tf_tag_frame);
-      tf2::convert(tf_tag_frame*tf_trg, tf_msg.transform);
+      tf2::convert(tf_tag_origin_on_cam.transform, tf_tag_frame);
+      tf2::convert(tf_tag_frame*tf_trg, tf_tag_trg_on_cam.transform);
 
       // Check whether camera reaches or not
-      if (isCameraReached(target, tf_msg))
+      if (isCameraReached(target, tf_tag_origin_on_cam))
       {
         string comment = "Reached!";
-        visualization_msgs::MarkerArray navi_mrk = makeNaviMarkers(comment, tf_msg);
+        visualization_msgs::MarkerArray navi_mrk = makeNaviMarkers(comment, tf_tag_trg_on_cam);
         navi_mrks_pub.publish(navi_mrk);
         ROS_INFO("Reached");
         ros::Duration(1.0).sleep();
@@ -263,7 +265,7 @@ int main(int argc, char** argv)
       {
         // Navigate camera
         string comment = "go to target";
-        visualization_msgs::MarkerArray navi_mrk = makeNaviMarkers(comment, tf_msg);
+        visualization_msgs::MarkerArray navi_mrk = makeNaviMarkers(comment, tf_tag_trg_on_cam);
         navi_mrks_pub.publish(navi_mrk);
       }
       auto stamp = ros::Time::now();
