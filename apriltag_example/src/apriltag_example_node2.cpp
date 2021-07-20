@@ -17,11 +17,11 @@ using namespace std;
 
 nav_msgs::Path generatePath(string tag_id = "tag_0")
 {
-  const double radius = 0.5;
-  const unsigned int layer_num = 3;
-  const unsigned int separate_num = 6; // (360/60)
-  const double layer_dis = 0.5;
-  const double least_height = 0.5;
+  const double radius = 0.2;
+  const unsigned int layer_num = 2;
+  const unsigned int separate_num = 4; // (360/separate_num deg)
+  const double layer_dis = 0.3;
+  const double least_height = 0.3;
 
   nav_msgs::Path path_msg;
   path_msg.header.frame_id = tag_id;
