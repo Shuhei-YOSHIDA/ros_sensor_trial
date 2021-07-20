@@ -26,7 +26,8 @@ nav_msgs::Path generatePath(string tag_id = "tag_0")
 
   nav_msgs::Path path_msg;
   path_msg.header.frame_id = tag_id;
-  path_msg.header.stamp = ros::Time::now();
+  auto stamp = ros::Time::now();
+  path_msg.header.stamp = stamp;
 
   for (int i = 0; i < layer_num; i++)
   {
@@ -35,6 +36,7 @@ nav_msgs::Path generatePath(string tag_id = "tag_0")
       double yaw_rad = 2.*M_PI/separate_num * j;
       geometry_msgs::PoseStamped p;
       p.header.frame_id = tag_id;
+      p.header.stamp = stamp;
       p.pose.position.x = radius*cos(yaw_rad);
       p.pose.position.y = radius*sin(yaw_rad);
       p.pose.position.z = least_height + layer_dis * i;
@@ -65,7 +67,9 @@ visualization_msgs::MarkerArray pathToMarkers(const nav_msgs::Path& path_msg)
     mrk.id = count;
     count++;
     mrk.color.a = 1.0;
-    mrk.color.b = 1.0; // blue
+    mrk.color.r = 0.678431;
+    mrk.color.g = 0.847059;
+    mrk.color.b = 0.901961; // light blue
     mrk.scale.z = 0.030;
 
     mrks_msg.markers.push_back(mrk);
@@ -248,7 +252,8 @@ int main(int argc, char** argv)
       else
       {
         // Navigate camera
-        visualization_msgs::MarkerArray navi_mrk;// = makeNaviMarkers();
+        string comment = "go to target";
+        visualization_msgs::MarkerArray navi_mrk = makeNaviMarkers(comment, tf_msg);
         navi_mrks_pub.publish(navi_mrk);
       }
 
