@@ -91,10 +91,10 @@ visualization_msgs::MarkerArray makeNaviMarkers(string comment,
     text_mrk.header.frame_id = trg.header.frame_id;
     text_mrk.header.stamp = stamp;
     text_mrk.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
-    text_mrk.text = "No tag detected";
+    text_mrk.text = comment; //"No tag detected"
     text_mrk.color.a = 1.0;
     text_mrk.color.r = 1.0; // Red
-    text_mrk.scale.z = 0.030;
+    text_mrk.scale.z = 0.100;
     text_mrk.pose.position.z = 0.2;
     text_mrk.pose.orientation.w = 1.0;
     text_mrk.id = 0;
@@ -126,11 +126,11 @@ visualization_msgs::MarkerArray makeNaviMarkers(string comment,
     text_mrk.header.frame_id = trg.header.frame_id;
     text_mrk.header.stamp = stamp;
     text_mrk.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
-    text_mrk.text = "Follow the arrow";
+    text_mrk.text = comment; //"Follow the arrow"
     text_mrk.color.a = 1.0;
     text_mrk.color.g = 1.0;
     text_mrk.color.b = 1.0; // Aqua
-    text_mrk.scale.z = 0.030;
+    text_mrk.scale.z = 0.100;
     text_mrk.pose.position.z = 0.2;
     text_mrk.pose.orientation.w = 1.0;
     text_mrk.id = 0;
@@ -224,11 +224,13 @@ int main(int argc, char** argv)
       geometry_msgs::TransformStamped tf_msg;
       try
       {
-        tf_msg = tf_buffer.lookupTransform(camera_frame_id, target_tag_frame_id, ros::Time(0));
+        auto stamp = ros::Time::now();
+        tf_buffer.canTransform(camera_frame_id, target_tag_frame_id, stamp, ros::Duration(0.1));
+        tf_msg = tf_buffer.lookupTransform(camera_frame_id, target_tag_frame_id, stamp);
       }
       catch (tf2::TransformException& ex)
       {
-        ROS_WARN("%s", ex.what());
+        ROS_DEBUG("%s", ex.what());
         // Show error message(Marker)
         string comment = "could not find any tag";
         tf_msg.header.frame_id = camera_frame_id;
@@ -256,6 +258,13 @@ int main(int argc, char** argv)
         visualization_msgs::MarkerArray navi_mrk = makeNaviMarkers(comment, tf_msg);
         navi_mrks_pub.publish(navi_mrk);
       }
+      auto stamp = ros::Time::now();
+      path_msg.header.stamp = stamp;
+      for (auto&& p : path_msg.poses) p.header.stamp = stamp;
+      for (auto&& m : mrks_msg.markers) m.header.stamp = stamp;
+      // Publish path
+      path_pub.publish(path_msg);
+      path_mrks_pub.publish(mrks_msg);
 
       loop.sleep();
     }
