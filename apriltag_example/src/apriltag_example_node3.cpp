@@ -119,7 +119,7 @@ int main(int argc, char** argv)
     mrks_msg.markers[i].color.r = 1.0;
     mrks_msg.markers[i].id = i;
     mrks_msg.markers[i].pose = posea_msg.poses[i];
-    mrks_msg.markers[i].scale.z = 0.50;
+    mrks_msg.markers[i].scale.z = 0.25;
     mrks_msg.markers[i].type = visualization_msgs::Marker::TEXT_VIEW_FACING;
     mrks_msg.markers[i].text = "not detected";
   }
