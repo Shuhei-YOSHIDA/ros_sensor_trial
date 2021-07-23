@@ -36,6 +36,13 @@ private:
 
 void MovingAve::addData(const geometry_msgs::TransformStamped& msg)
 {
+  if (!_deq.empty() &&
+      msg.header.frame_id != "" &&
+      _deq.back().header.stamp > msg.header.stamp + ros::Duration(3.0))
+  {
+    ROS_WARN("Old timestamp data(more than 3sec ago) has come. So reset deque");
+    _deq.clear();
+  }
   if (msg.header.frame_id != "")  _deq.push_back(msg);
 
   auto now_stamp = ros::Time::now();
@@ -120,12 +127,13 @@ int main(int argc, char** argv)
 
   ros::Rate loop(50);
 
+  ros::Time::waitForValid(); // For rosbag replay
+
   while(ros::ok())
   {
     ros::spinOnce();
     geometry_msgs::TransformStamped tag_01, tag_02;
-    //auto stamp = ros::Time::now() - ros::Duration(0.100);
-    auto stamp = ros::Time::now();// - ros::Duration(0.100);
+    auto stamp = ros::Time::now() - ros::Duration(0.100);
     try
     {
       tf_buffer.canTransform(id0, id1, stamp, ros::Duration(1./30));
