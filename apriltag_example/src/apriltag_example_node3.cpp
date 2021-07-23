@@ -171,7 +171,7 @@ int main(int argc, char** argv)
       mrks_msg.markers[0].pose.position.z += 0.5;
       mrks_msg.markers[0].text =
         to_string(x) + "m\n" + to_string(y) + "m\n" + to_string(z) + "m\n"
-        + "norm: " + to_string((r-ref_01).norm()) + "m";
+        + "diff: " + to_string((r-ref_01).norm()) + "m";
     }
     else
     {
@@ -199,7 +199,7 @@ int main(int argc, char** argv)
       mrks_msg.markers[1].pose.position.z += 0.5;
       mrks_msg.markers[1].text =
         to_string(x) + "m\n" + to_string(y) + "m\n" + to_string(z) + "m\n"
-        + "norm: " + to_string((r-ref_02).norm()) + "m";
+        + "diff: " + to_string((r-ref_02).norm()) + "m";
     }
     else
     {
