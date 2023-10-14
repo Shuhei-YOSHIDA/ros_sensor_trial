@@ -18,7 +18,42 @@ void orb_test(const cv::Mat& img)
   cv::Mat img_keypoints;
   cv::drawKeypoints(img, keypoints, img_keypoints);
 
+  for (auto kp : keypoints)
+  {
+    std::cout << kp.angle << ", " << kp.response << ", "
+      << kp.size << ", "  << kp.octave << std::endl;
+  }
+
   cv::imshow("ORB keypoints", img_keypoints);
+  cv::waitKey();
+}
+
+
+void orb_descriptor_test(const cv::Mat& img)
+{
+  cv::Ptr<cv::ORB> detector = cv::ORB::create();
+  std::vector<cv::KeyPoint> keypoints;
+  //detector->detect(img, keypoints);
+  cv::Mat descriptors;
+  detector->detectAndCompute(img, cv::noArray(), keypoints, descriptors);
+
+  cv::Mat img_keypoints;
+  cv::drawKeypoints(img, keypoints, img_keypoints);
+
+  for (auto kp : keypoints)
+  {
+    std::cout << kp.angle << ", " << kp.response << ", "
+      << kp.size << ", "  << kp.octave << std::endl;
+  }
+  std::cout << "keypoints size:"  << keypoints.size() << std::endl;
+
+  std::cout << "descriptor, type:" << descriptors.type()
+    << ", rows:" << descriptors.rows << ", cols:" << descriptors.cols << std::endl;
+
+
+  cv::imshow("ORB keypoints", img_keypoints);
+  cv::waitKey();
+  cv::imshow("ORB descriptors", descriptors);
   cv::waitKey();
 }
 
@@ -36,5 +71,6 @@ int main(int argc, char **argv)
   //cv::waitKey();
 
   orb_test(src);
+  orb_descriptor_test(src);
   return 0;
 }
